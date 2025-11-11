@@ -12,13 +12,13 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.LinBusListener";
 
-#define QUEUE_WAIT_BLOCKING (portTickType) portMAX_DELAY
+#define QUEUE_WAIT_BLOCKING portMAX_DELAY
 
 void LinBusListener::setup_framework() {
   auto uartComp = static_cast<ESPHOME_UART *>(this->parent_);
 
-  auto uart_num = uartComp->get_hw_serial_number();
-  auto hw_serial = uartComp->get_hw_serial();
+  auto uart_num = uartComp->get_uart_num();   // funktioniert in UARTComponent
+  auto hw_serial = nullptr; // nicht mehr benötigt
 
   // Extract from `uartSetFastReading` - Can't call it because I don't have access to `uart_t` object.
 
