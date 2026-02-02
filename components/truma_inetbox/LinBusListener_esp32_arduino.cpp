@@ -37,18 +37,6 @@ void LinBusListener::setup_framework() {
   uart_intr_config(static_cast<uart_port_t>(uart_num), &uart_intr);
 
   hw_serial->onReceive([this]() { this->onReceive_(); }, false);
-  hw_serial->onReceiveError([this](hardwareSerial_error_t val) {
-    // Ignore any data present in buffer
-    this->clear_uart_buffer_();
-    if (val == UART_BREAK_ERROR) {
-      // If the break is valid the `onReceive` is called first and the break is handeld. Therfore the expectation is
-      // that the state should be in waiting for `SYNC`.
-      if (this->current_state_ != READ_STATE_SYNC) {
-        this->current_state_ = READ_STATE_BREAK;
-      }
-      return;
-    }
-  });
 
   // Creating LIN msg event Task
   xTaskCreatePinnedToCore(LinBusListener::eventTask_,
