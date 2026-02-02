@@ -33,13 +33,13 @@ struct QUEUE_LIN_MSG {
   uint8_t len;
 };
 
-class LinBusListener : public PollingComponent, public uart::UARTDevice {
+class LinBusListener : public Component, public uart::UARTDevice {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
 
   void dump_config() override;
   void setup() override;
-  void update() override;
+  void loop() override;
 
   void set_lin_checksum(LIN_CHECKSUM val) { this->lin_checksum_ = val; }
   void set_cs_pin(GPIOPin *pin) { this->cs_pin_ = pin; }
