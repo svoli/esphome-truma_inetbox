@@ -70,7 +70,13 @@ void LinBusListener::setup() {
   }
 }
 
-void LinBusListener::update() { this->check_for_lin_fault_(); }
+void LinBusListener::loop() {
+  while (this->available()) {
+    uint8_t c;
+    this->read_byte(&c);
+    this->on_byte_(c);   // deine bestehende LIN-Logik
+  }
+}
 
 void LinBusListener::write_lin_answer_(const uint8_t *data, uint8_t len) {
   QUEUE_LOG_MSG log_msg = QUEUE_LOG_MSG();
