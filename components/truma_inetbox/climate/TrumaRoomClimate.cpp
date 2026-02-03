@@ -131,7 +131,7 @@ climate::ClimateTraits TrumaRoomClimate::traits() {
   climate::ClimateTraits traits;
 
   // Aktuelle Temperatur unterstützen
-  traits.set_supports_current_temperature(true);
+  traits.add_feature_flags(climate::ClimateFeature::SUPPORTS_CURRENT_TEMPERATURE);
 
   // Unterstützte Modi
   climate::ClimateModeMask mode_mask;
