@@ -60,7 +60,7 @@ climate::ClimateTraits TrumaWaterClimate::traits() {
   climate::ClimateTraits traits;
 
   // Aktuelle Temperatur unterstützen
-  traits.add_feature_flags(climate::ClimateFeature::SUPPORTS_CURRENT_TEMPERATURE);
+  traits.add_feature_flags(climate::ClimateFeature::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
 
   // Unterstützte Modi
   climate::ClimateModeMask mode_mask;
