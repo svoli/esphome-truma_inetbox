@@ -1,36 +1,44 @@
 #pragma once
 
 #include "esphome/components/climate/climate.h"
+#include "esphome/core/component.h"
 #include "esphome/components/truma_inetbox/TrumaiNetBoxApp.h"
 #include <set>  // Für std::set
 
 namespace esphome {
 namespace truma_inetbox {
 
-class TrumaRoomClimate : public climate::Climate, public TrumaiNetBoxApp {
+class TrumaRoomClimate : public Component, public climate::Climate, public Parented<TrumaiNetBoxApp> {
  public:
-  // Konstruktor
-  TrumaRoomClimate(TrumaiNetBoxApp* app);
-
   // Lifecycle
   void setup() override;
-  void loop() override;
+  void loop() override {}
+  void dump_config() override;
 
-  // ESPHome 2026-kompatible Traits-Funktion
+  // Steuerung aus ESPHome
+  void control(const climate::ClimateCall &call) override;
+
+  // Traits definieren
   climate::ClimateTraits traits() override;
 
-  // Methoden zum Setzen der unterstützten Modi
+  // Visualisierungseinstellungen
+  void set_visual_min_temperature(float value) { this->visual_min_temperature_ = value; }
+  void set_visual_max_temperature(float value) { this->visual_max_temperature_ = value; }
+  void set_visual_temperature_step(float value) { this->visual_temperature_step_ = value; }
+
+  // Unterstützte Modi setzen
   void set_supported_modes(const std::set<climate::ClimateMode> &modes);
 
  protected:
-  // Interne Hilfsmethoden für Mode-Konvertierung etc.
-  void update_state_from_app();
-  void send_mode_to_app(climate::ClimateMode mode);
+  // Unterstützte Modi
+  std::set<climate::ClimateMode> supported_modes_;
 
- private:
-  // Interne Variablen
-  std::set<climate::ClimateMode> supported_modes_;  // nur zur internen Verwaltung
-  TrumaiNetBoxApp* app_;
+  // Visualisierung von Temperatur
+  float visual_min_temperature_{5.0};
+  float visual_max_temperature_{30.0};
+  float visual_temperature_step_{1.0};
+
+  // Interne Hilfsmethoden können hier noch ergänzt werden, falls benötigt
 };
 
 }  // namespace truma_inetbox
