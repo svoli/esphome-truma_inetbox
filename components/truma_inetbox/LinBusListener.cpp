@@ -78,6 +78,10 @@ void LinBusListener::loop() {
   }
 }
 
+void LinBusListener::on_byte_(uint8_t byte) {
+  this->lin_bus_protocol_.process_byte(byte);
+}
+
 void LinBusListener::write_lin_answer_(const uint8_t *data, uint8_t len) {
   QUEUE_LOG_MSG log_msg = QUEUE_LOG_MSG();
   if (!this->can_write_lin_answer_) {
