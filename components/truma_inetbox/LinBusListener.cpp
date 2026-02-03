@@ -32,7 +32,7 @@ void LinBusListener::dump_config() {
   ESP_LOGCONFIG(TAG, "LinBusListener:");
   LOG_PIN("  CS Pin: ", this->cs_pin_);
   LOG_PIN("  FAULT Pin: ", this->fault_pin_);
-  LOG_UPDATE_INTERVAL(this);
+  ESP_LOGCONFIG("truma_inetbox", "  LinBusListener running in UART loop mode");
   ESP_LOGCONFIG(TAG, "  LIN checksum Version: %d", this->lin_checksum_ == LIN_CHECKSUM::LIN_CHECKSUM_VERSION_1 ? 1 : 2);
   ESP_LOGCONFIG(TAG, "  Observer mode: %s", YESNO(this->observer_mode_));
   this->check_uart_settings(9600, 2, esphome::uart::UART_CONFIG_PARITY_NONE, 8);
