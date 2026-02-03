@@ -30,8 +30,6 @@ void TrumaiNetBoxApp::update() {
   this->heater_.update();
   this->timer_.update();
 
-  LinBusProtocol::update();
-
 #ifdef USE_TIME
   // Update time of CP Plus automatically when
   // - Time component configured
