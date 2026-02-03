@@ -126,14 +126,19 @@ void TrumaRoomClimate::control(const climate::ClimateCall &call) {
   */
 }
 
-// Traits definieren
+// Traits definieren (ESPHome 2026-kompatibel)
 climate::ClimateTraits TrumaRoomClimate::traits() {
   climate::ClimateTraits traits;
-  traits.set_supports_current_temperature(true);
 
-  // Set von unterstützten Modi
-  std::vector<climate::ClimateMode> modes_vec(supported_modes_.begin(), supported_modes_.end());
-  traits.set_supported_modes(modes_vec);
+  // Aktuelle Temperatur unterstützen
+  traits.add_feature_flags(climate::ClimateFeature::SUPPORTS_CURRENT_TEMPERATURE);
+
+  // Unterstützte Modi
+  climate::ClimateModeMask mode_mask;
+  for (auto mode : supported_modes_) {
+    mode_mask.set(mode, true);
+  }
+  traits.set_supported_modes(mode_mask);
 
   // Unterstützte Fan-Modes
   traits.set_supported_fan_modes({
@@ -143,19 +148,11 @@ climate::ClimateTraits TrumaRoomClimate::traits() {
       climate::CLIMATE_FAN_HIGH,
   });
 
-  // Presets bleiben auskommentiert
-  /*
-  traits.set_supported_presets({
-      climate::CLIMATE_PRESET_NONE,
-      climate::CLIMATE_PRESET_ECO,
-      climate::CLIMATE_PRESET_COMFORT,
-      climate::CLIMATE_PRESET_BOOST,
-  });
-  */
+  // Visualisierung
+  traits.set_visual_min_temperature(visual_min_temperature_);
+  traits.set_visual_max_temperature(visual_max_temperature_);
+  traits.set_visual_temperature_step(visual_temperature_step_);
 
-  traits.set_visual_min_temperature(5);
-  traits.set_visual_max_temperature(30);
-  traits.set_visual_temperature_step(1);
   return traits;
 }
 
@@ -166,4 +163,3 @@ void TrumaRoomClimate::set_supported_modes(const std::set<climate::ClimateMode> 
 
 }  // namespace truma_inetbox
 }  // namespace esphome
-
