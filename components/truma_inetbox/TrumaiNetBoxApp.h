@@ -21,7 +21,7 @@ namespace truma_inetbox {
 class TrumaiNetBoxApp : public LinBusProtocol {
  public:
   TrumaiNetBoxApp();
-  void update() override;
+  void update();  // kein override
 
   const std::array<uint8_t, 4> lin_identifier() override;
   void lin_heartbeat() override;
