@@ -1,5 +1,6 @@
 #include "TrumaWaterClimate.h"
 #include "esphome/components/truma_inetbox/helpers.h"
+#include <set>  // Für std::set
 
 namespace esphome {
 namespace truma_inetbox {
@@ -7,45 +8,57 @@ namespace truma_inetbox {
 static const char *const TAG = "truma_inetbox.water_climate";
 
 void TrumaWaterClimate::setup() {
+  // Callback, wenn neue Statusmeldungen vom Heizgerät kommen
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
-    // Publish updated state
+    // Aktuelle Werte aus Statusframe übernehmen
     this->target_temperature = water_temp_200_fix(temp_code_to_decimal(status_heater->target_temp_water));
     this->current_temperature = temp_code_to_decimal(status_heater->current_temp_water);
-    this->mode = (status_heater->target_temp_water == TargetTemp::TARGET_TEMP_OFF) ? climate::CLIMATE_MODE_OFF
-                                                                                   : climate::CLIMATE_MODE_HEAT;
+    this->mode = (status_heater->target_temp_water == TargetTemp::TARGET_TEMP_OFF) ? 
+                 climate::CLIMATE_MODE_OFF : climate::CLIMATE_MODE_HEAT;
+
     this->publish_state();
   });
 }
 
-void TrumaWaterClimate::dump_config() { LOG_CLIMATE(TAG, "Truma Climate", this); }
+void TrumaWaterClimate::dump_config() {
+  LOG_CLIMATE(TAG, "Truma Water Climate", this);
+}
 
 void TrumaWaterClimate::control(const climate::ClimateCall &call) {
+  // Temperaturänderung
   if (call.get_target_temperature().has_value()) {
     float temp = *call.get_target_temperature();
     this->parent_->get_heater()->action_heater_water(static_cast<u_int8_t>(temp));
   }
 
+  // Modusänderung
   if (call.get_mode().has_value()) {
     climate::ClimateMode mode = *call.get_mode();
     auto status_heater = this->parent_->get_heater()->get_status();
     switch (mode) {
       case climate::CLIMATE_MODE_HEAT:
         if (status_heater->target_temp_water == TargetTemp::TARGET_TEMP_OFF) {
-          this->parent_->get_heater()->action_heater_water(40);
+          this->parent_->get_heater()->action_heater_water(40);  // Default-Wassertemperatur
         }
         break;
       default:
-        this->parent_->get_heater()->action_heater_water(0);
+        this->parent_->get_heater()->action_heater_water(0);  // AUS
         break;
     }
   }
 }
 
 climate::ClimateTraits TrumaWaterClimate::traits() {
-  // The capabilities of the climate device
   auto traits = climate::ClimateTraits();
   traits.set_supports_current_temperature(true);
-  traits.set_supported_modes(this->supported_modes_);
+
+  // Unterstützte Modi als ClimateModeMask übergeben
+  climate::ClimateModeMask mode_mask;
+  for (const auto &mode : this->supported_modes_) {
+    mode_mask.add(mode);
+  }
+  traits.set_supported_modes(mode_mask);
+
   traits.set_visual_min_temperature(40);
   traits.set_visual_max_temperature(80);
   traits.set_visual_temperature_step(20);
